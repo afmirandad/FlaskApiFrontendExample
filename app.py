@@ -14,6 +14,9 @@ def login():
     username = request.form.get('username')
     password = request.form.get('password')
     
+    if not username or not password:
+        return jsonify({'success': False})
+    
     try:
         response = requests.post(
             f"{API_ENDPOINT}/users/login",
@@ -28,7 +31,10 @@ def login():
         else:
             return jsonify({'success': False})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+        app.logger.error(f"Login error: {str(e)}")
+        return jsonify({'success': False})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    import os
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode, host='127.0.0.1', port=5000)
